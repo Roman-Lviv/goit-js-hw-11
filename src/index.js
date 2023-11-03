@@ -47,9 +47,7 @@ const displayImages = images => {
     gallery.innerHTML += cardTemplate(image);
   });
 
-  const lightbox = new SimpleLightbox('.gallery a', {
-    /* параметри для SimpleLightbox */
-  });
+  const lightbox = new SimpleLightbox('.gallery a', {});
 
   if (images.length === 0) {
     loadMoreButton.style.display = 'none';
