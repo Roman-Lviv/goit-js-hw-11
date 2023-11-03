@@ -1,3 +1,5 @@
+import { searchImages } from './js/api';
+
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
@@ -9,12 +11,12 @@ searchForm.addEventListener('submit', async e => {
   query = searchForm.searchQuery.value;
   page = 1;
   clearGallery();
-  searchImages(query);
+  await performSearch(query, page);
 });
 
-loadMoreButton.addEventListener('click', () => {
+loadMoreButton.addEventListener('click', async () => {
   page++;
-  searchImages(query);
+  await performSearch(query, page);
 });
 
 const clearGallery = () => {
@@ -45,30 +47,23 @@ const displayImages = images => {
   if (images.length === 0) {
     loadMoreButton.style.display = 'none';
     notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+      'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
     );
   } else {
     loadMoreButton.style.display = 'block';
   }
 };
 
-const searchImages = async searchQuery => {
-  const apiKey = 'YOUR_API_KEY';
-  const perPage = 40;
+const performSearch = async (searchQuery, page) => {
+  const data = await searchImages(searchQuery, page);
 
-  const apiUrl = `https://pixabay.com/api/?key=${apiKey}&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`;
-
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-
+  if (data) {
     if (data.totalHits > 0) {
       displayImages(data.hits);
 
       if (page === 1) {
-        notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+        notiflix.Notify.success(`Ура! Ми знайшли ${data.totalHits} зображень.`);
       }
-
       const { height: cardHeight } =
         gallery.firstElementChild.getBoundingClientRect();
       window.scrollBy({
@@ -77,17 +72,15 @@ const searchImages = async searchQuery => {
       });
     } else {
       notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
+        'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
       );
     }
 
-    if (data.totalHits <= page * perPage) {
+    if (data.totalHits <= page * data.hits.length) {
       loadMoreButton.style.display = 'none';
       notiflix.Notify.warning(
-        "We're sorry, but you've reached the end of search results."
+        'На жаль, ви дійшли до кінця результатів пошуку.'
       );
     }
-  } catch (error) {
-    console.error('Error fetching data:', error);
   }
 };
