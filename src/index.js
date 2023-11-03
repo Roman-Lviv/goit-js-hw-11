@@ -1,5 +1,8 @@
 import { searchImages } from './js/api';
 
+import Notiflix from 'notiflix';
+import 'notiflix';
+
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
