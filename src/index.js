@@ -1,7 +1,9 @@
+import 'notiflix';
 import { searchImages } from './js/api';
 
 import Notiflix from 'notiflix';
-import 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
