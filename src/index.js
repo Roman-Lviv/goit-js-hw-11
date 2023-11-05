@@ -92,7 +92,7 @@ const performSearch = async (searchQuery, page) => {
         );
       }
 
-      const lastPage = Meth.ceil(data.tetelHits / 40);
+      const lastPage = Meth.ceil(data.totalHits / 40);
 
       if (lastPage == page) {
         loadMoreButton.style.display = 'none';
