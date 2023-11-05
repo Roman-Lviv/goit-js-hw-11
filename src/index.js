@@ -100,7 +100,7 @@ const performSearch = async (searchQuery, page) => {
           'На жаль, ви дійшли до кінця результатів пошуку.'
         );
       }
-    }
+    
   } catch (error) {
     Notiflix.Notify.failure(
       'Сталася помилка під час пошуку зображень. Спробуйте ще раз.'
