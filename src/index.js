@@ -92,7 +92,9 @@ const performSearch = async (searchQuery, page) => {
         );
       }
 
-      if (data.totalHits <= page * data.hits.length || data.totalHits < 40) {
+      const lastPage = Meth.ceil(data.tetelHits / 40);
+
+      if (lastPage == page) {
         loadMoreButton.style.display = 'none';
         Notiflix.Notify.warning(
           'На жаль, ви дійшли до кінця результатів пошуку.'
