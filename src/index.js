@@ -13,10 +13,10 @@ let query = '';
 
 searchForm.addEventListener('submit', async e => {
   e.preventDefault();
-  query = searchForm.searchQuery.value.trim(); 
+  query = searchForm.searchQuery.value.trim();
   page = 1;
   clearGallery();
-  if (!query) return; 
+  if (!query) return;
   await performSearch(query, page);
 });
 
@@ -44,13 +44,11 @@ const displayImages = images => {
     </div>
   `;
 
-  const cardMarkup = images.map(image => cardTemplate(image)).join(''); 
+  const cardMarkup = images.map(image => cardTemplate(image)).join('');
 
-  gallery.innerHTML = cardMarkup; 
+  gallery.innerHTML = cardMarkup;
 
-  const lightbox = new SimpleLightbox('.gallery a', {
-   
-  });
+  const lightbox = new SimpleLightbox('.gallery a', {});
 
   if (images.length === 0) {
     loadMoreButton.style.display = 'none';
@@ -62,45 +60,48 @@ const displayImages = images => {
   }
 };
 
-const performSearch = (searchQuery, page) => {
+const performSearch = async (searchQuery, page) => {
   if (!searchQuery) {
     Notiflix.Notify.warning('Введіть ключове слово для пошуку.');
     return;
   }
 
-  searchImages(searchQuery, page)
-    .then(data => {
-      if (data) {
-        if (data.totalHits > 0) {
-          displayImages(data.hits);
+  try {
+    const data = await searchImages(searchQuery, page);
 
-          if (page === 1) {
-            Notiflix.Notify.success(`Ура! Ми знайшли ${data.totalHits} зображень.`);
-          }
+    if (data) {
+      if (data.totalHits > 0) {
+        displayImages(data.hits);
 
-          const { height: cardHeight } =
-            gallery.firstElementChild.getBoundingClientRect();
-          window.scrollBy({
-            top: cardHeight * 2,
-            behavior: 'smooth',
-          });
-        } else {
-          Notiflix.Notify.failure(
-            'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
+        if (page === 1) {
+          Notiflix.Notify.success(
+            `Ура! Ми знайшли ${data.totalHits} зображень.`
           );
         }
 
-        if (data.totalHits <= page * data.hits.length || data.totalHits < 40) {
-          loadMoreButton.style.display = 'none';
-          Notiflix.Notify.warning(
-            'На жаль, ви дійшли до кінця результатів пошуку.'
-          );
-        }
-      })
-      .catch(error => {
+        const { height: cardHeight } =
+          gallery.firstElementChild.getBoundingClientRect();
+        window.scrollBy({
+          top: cardHeight * 2,
+          behavior: 'smooth',
+        });
+      } else {
         Notiflix.Notify.failure(
-          'Сталася помилка під час пошуку зображень. Спробуйте ще раз.'
+          'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
         );
-        console.error('Помилка під час пошуку зображень:', error);
-      });
+      }
+
+      if (data.totalHits <= page * data.hits.length || data.totalHits < 40) {
+        loadMoreButton.style.display = 'none';
+        Notiflix.Notify.warning(
+          'На жаль, ви дійшли до кінця результатів пошуку.'
+        );
+      }
+    }
+  } catch (error) {
+    Notiflix.Notify.failure(
+      'Сталася помилка під час пошуку зображень. Спробуйте ще раз.'
+    );
+    console.error('Помилка під час пошуку зображень:', error);
+  }
 };
