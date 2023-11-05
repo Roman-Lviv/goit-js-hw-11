@@ -94,7 +94,7 @@ const performSearch = async (searchQuery, page) => {
 
       const lastPage = Math.ceil(data.totalHits / 40);
 
-      if (lastPage == page) {
+      if (lastPage === page) {
         loadMoreButton.style.display = 'none';
         Notiflix.Notify.warning(
           'На жаль, ви дійшли до кінця результатів пошуку.'
