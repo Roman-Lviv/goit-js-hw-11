@@ -1,7 +1,7 @@
 import Notiflix from 'notiflix';
 import { searchImages } from './js/api';
-// import SimpleLightbox from 'simplelightbox';
-// // import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 Notiflix.Notify.init();
 
