@@ -9,7 +9,7 @@ export const searchImages = async (searchQuery, page) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Помилка при отриманні даних:', error);
+    console.error('Error fetching data:', error);
     return null;
   }
 };

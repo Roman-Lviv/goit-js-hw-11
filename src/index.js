@@ -1,13 +1,11 @@
 import 'notiflix';
-import { searchImages } from './js/api';
-
 import Notiflix from 'notiflix';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import { searchImages } from './js/api';
 
 const searchForm = document.getElementById('search-form');
 const gallery = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
+const endMessage = document.querySelector('.end-message'); // Повідомлення про кінець результатів
 let page = 1;
 let query = '';
 
@@ -30,18 +28,18 @@ const clearGallery = () => {
 
 const displayImages = images => {
   const cardTemplate = image => `
-        <div class="photo-card">
-            <a href="${image.largeImageURL}" data-lightbox="gallery" data-title="${image.tags}">
-                <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
-            </a>
-            <div class="info">
-                <p class="info-item"><b>Likes:</b> ${image.likes}</p>
-                <p class="info-item"><b>Views:</b> ${image.views}</p>
-                <p class="info-item"><b>Comments:</b> ${image.comments}</p>
-                <p class="info-item"><b>Downloads:</b> ${image.downloads}</p>
-            </div>
-        </div>
-    `;
+    <div class="photo-card">
+      <a href="${image.largeImageURL}" data-lightbox="gallery" data-title="${image.tags}">
+        <img src="${image.webformatURL}" alt="${image.tags}" loading="lazy" />
+      </a>
+      <div class="info">
+        <p class="info-item"><b>Likes:</b> ${image.likes}</p>
+        <p class="info-item"><b>Views:</b> ${image.views}</p>
+        <p class="info-item"><b>Comments:</b> ${image.comments}</p>
+        <p class="info-item"><b>Downloads:</b> ${image.downloads}</p>
+      </div>
+    </div>
+  `;
 
   images.forEach(image => {
     gallery.innerHTML += cardTemplate(image);
@@ -52,8 +50,9 @@ const displayImages = images => {
   if (images.length === 0) {
     loadMoreButton.style.display = 'none';
     notiflix.Notify.failure(
-      'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
+      'Sorry, there are no images matching your search query. Please try again.'
     );
+    endMessage.style.display = 'none';
   } else {
     loadMoreButton.style.display = 'block';
   }
@@ -61,7 +60,7 @@ const displayImages = images => {
 
 const performSearch = async (searchQuery, page) => {
   if (!searchQuery.trim()) {
-    notiflix.Notify.warning('Введіть ключове слово для пошуку.');
+    notiflix.Notify.warning('Please enter a search keyword.');
     return;
   }
 
@@ -69,11 +68,8 @@ const performSearch = async (searchQuery, page) => {
 
   if (data) {
     if (data.totalHits > 0) {
+      notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
       displayImages(data.hits);
-
-      if (page === 1) {
-        notiflix.Notify.success(`Ура! Ми знайшли ${data.totalHits} зображень.`);
-      }
 
       const { height: cardHeight } =
         gallery.firstElementChild.getBoundingClientRect();
@@ -83,15 +79,17 @@ const performSearch = async (searchQuery, page) => {
       });
     } else {
       notiflix.Notify.failure(
-        'На жаль, не знайдено зображень, що відповідають вашому запиту. Спробуйте ще раз.'
+        'Sorry, there are no images matching your search query. Please try again.'
       );
+      loadMoreButton.style.display = 'none';
+      endMessage.style.display = 'none';
     }
 
     if (data.totalHits <= page * data.hits.length) {
       loadMoreButton.style.display = 'none';
-      notiflix.Notify.warning(
-        'На жаль, ви дійшли до кінця результатів пошуку.'
-      );
+      endMessage.style.display = 'block';
+    } else {
+      endMessage.style.display = 'none';
     }
   }
 };
